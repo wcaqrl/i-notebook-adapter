@@ -89,6 +89,8 @@ def init_old(root):
                        (id_, title, content, parent, 7, 1747000000000, 1747000000000, 1747000000000))
         db.execute('INSERT INTO "NoteHistory" (id,noteId,noteTitle,content,createdAt) VALUES (?,?,?,?,?)',
                    ("lzchistory01", CHILD, TITLE, content, 1747000000000))
+        db.execute('INSERT INTO Task (id,title,content,progress) VALUES (?,?,?,?)',
+                   ("lzctask00001", "升级前旧任务", content, 73))
         configure_api(root, db)
     print("Prepared approved 0.0.1 LPK database with 0.7.1 schema, nested Chinese notes, history and settings.")
 
@@ -141,6 +143,10 @@ def check_database(root, legacy):
             assert title == TITLE and parent == PARENT and sort_order == expected_sort and star, f"Lost note metadata: {(title, parent, sort_order, star)!r}"
             assert TEXT in content and read_state(root)["old_attachment"] in content, "Lost note content"
             assert db.execute('SELECT noteTitle FROM NoteHistory WHERE id=?', ("lzchistory01",)).fetchone() == (TITLE,), "Lost history"
+            archives = list((root / "data/legacy-task-exports").glob("tasks-*.json"))
+            assert len(archives) == 1, "Missing legacy task archive"
+            tasks = json.loads(archives[0].read_text())["tasks"]
+            assert any(t['id'] == 'lzctask00001' and t['title'] == '升级前旧任务' and t['progress'] == 73 for t in tasks), "Lost legacy task fields"
         assert db.execute('SELECT value FROM Config WHERE key="openApiEnabled"').fetchone() == ("true",)
         assert db.execute('SELECT count(*) FROM i_notebook_migrations').fetchone()[0] >= 1
     print("SQLite integrity, migration records and persisted application data verified.")

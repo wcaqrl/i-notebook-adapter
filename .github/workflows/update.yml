@@ -8,6 +8,7 @@ on:
       - .github/workflows/update.yml
       - scripts/**
       - tests/**
+      - content/**
       - lazycat-action.yml
       - lzc-build.yml
       - lzc-manifest.yml
@@ -43,6 +44,8 @@ jobs:
       - name: Validate adapter scripts and packaging guards
         run: |
           bash -n scripts/test-upgrade.sh
+          node --check content/prepare-runtime.mjs
+          node --test tests/runtime-compat.test.mjs
           python3 -B -m unittest discover -s tests -v
       - name: Exercise real upgrade and fresh installation when adapter code changes
         if: github.event_name == 'push'

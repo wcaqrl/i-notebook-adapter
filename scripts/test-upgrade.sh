@@ -32,15 +32,26 @@ trap on_error ERR
 
 docker pull --platform "$PLATFORM" "$OLD_IMAGE" >/dev/null
 docker pull --platform "$PLATFORM" "$NEW_IMAGE" >/dev/null
+# The test runs as the Runner UID. Copy only the runtime JS directory to a
+# writable disposable bind; production setup_script patches the same module
+# in the container rootfs before the original startup command executes.
+mkdir -p "$TEST_ROOT/runtime"
+docker create --name "$CONTAINER" "$NEW_IMAGE" >/dev/null
+docker cp "$CONTAINER:/app/server/_ssr/." "$TEST_ROOT/runtime"
+docker rm "$CONTAINER" >/dev/null
 
 start_notebook() {
   local image="$1" root="$2" mode="$3" db_mount upload_mount port deadline
+  local -a extra_args=() command=()
   docker rm --force "$CONTAINER" >/dev/null 2>&1 || true
   db_mount=/appdata
   upload_mount=/app/uploads
   if [[ "$mode" == legacy ]]; then
     db_mount=/app/prisma
     upload_mount=/app/public/uploads
+  else
+    extra_args=(--volume "$TEST_ROOT/runtime:/app/server/_ssr" --volume "$PWD/content:/lzcapp/pkg/content:ro" --entrypoint sh)
+    command=(-eu -c 'node /lzcapp/pkg/content/prepare-runtime.mjs; exec docker-entrypoint.sh ./scripts/docker-start.sh')
   fi
   docker run --detach --name "$CONTAINER" --platform "$PLATFORM" \
     --user "$(id -u):$(id -g)" --memory 1g --cpus 2 \
@@ -49,7 +60,7 @@ start_notebook() {
     --env SITE_URL=http://localhost \
     --volume "$root/data:$db_mount" \
     --volume "$root/data/uploads:$upload_mount" \
-    "$image" >/dev/null
+    "${extra_args[@]}" "$image" "${command[@]}" >/dev/null
   port="$(docker port "$CONTAINER" 3000/tcp | awk -F: 'NR == 1 {print $NF}')"
   deadline=$((SECONDS + 150))
   while (( SECONDS < deadline )); do
@@ -96,12 +107,13 @@ python3 -B scripts/notebook-fixture.py verify-fresh "$TEST_ROOT/fresh" "http://1
 docker stop --time 20 "$CONTAINER" >/dev/null
 
 python3 - "$PROOF" "$LAZYCAT_SOURCE_VERSION" "${LAZYCAT_APPLICATION_VERSION:-$LAZYCAT_SOURCE_VERSION}" "$LAZYCAT_SOURCE_REVISION" <<'PY'
-import json, pathlib, sys
+import hashlib, json, pathlib, sys
 path, source, application, digest = sys.argv[1:]
 pathlib.Path(path).write_text(json.dumps({
     'baseline_lpk_version': '0.0.1', 'baseline_source_version': '0.7.1',
     'source_version': source, 'application_version': application, 'digest': digest,
-    'checks': ['legacy-schema', 'notes', 'hierarchy', 'history', 'settings', 'api-auth', 'attachments', 'fresh-install', 'sqlite', 'migration-backup', 'restart'],
+    'runtime_patch_sha256': hashlib.sha256(pathlib.Path('content/prepare-runtime.mjs').read_bytes()).hexdigest(),
+    'checks': ['legacy-schema', 'notes', 'hierarchy', 'history', 'legacy-task-export', 'settings', 'api-auth', 'attachments', 'fresh-install', 'sqlite', 'migration-backup', 'restart'],
 }, indent=2) + '\n')
 PY
 echo "Verified 0.7.1 -> $LAZYCAT_SOURCE_VERSION and fresh installation; safe to package the tested digest."

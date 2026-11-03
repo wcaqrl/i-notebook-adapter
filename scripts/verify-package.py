@@ -1,11 +1,12 @@
 """Fail packaging unless this exact upstream digest passed all runtime tests."""
 
+import hashlib
 import json
 from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parent.parent
-CHECKS = ['legacy-schema', 'notes', 'hierarchy', 'history', 'settings', 'api-auth', 'attachments', 'fresh-install', 'sqlite', 'migration-backup', 'restart']
+CHECKS = ['legacy-schema', 'notes', 'hierarchy', 'history', 'legacy-task-export', 'settings', 'api-auth', 'attachments', 'fresh-install', 'sqlite', 'migration-backup', 'restart']
 
 
 def verify(root):
@@ -23,9 +24,11 @@ def verify(root):
         raise ValueError("Package version differs from tested application version")
     if proof.get("checks") != CHECKS or proof.get("baseline_source_version") != "0.7.1":
         raise ValueError("Incomplete upgrade and initialization evidence")
+    if proof.get("runtime_patch_sha256") != hashlib.sha256((root / 'content/prepare-runtime.mjs').read_bytes()).hexdigest():
+        raise ValueError("Runtime compatibility helper differs from the tested content")
     if not re.search(r"^\s+image: registry\.lazycat\.cloud/\S+\s*$", manifest, re.MULTILINE):
         raise ValueError("Official image copy has not completed")
-    for required in ("/lzcapp/var/data:/appdata", "/lzcapp/var/data/uploads:/app/uploads", "DATABASE_URL=file:/appdata/db.sqlite", "SITE_URL=https://{{ .S.AppDomain }}", "/uploads/=http://notebook.com.luck.lazycat.notebook.lzcapp:3000/api/file/"):
+    for required in ("/lzcapp/var/data:/appdata", "/lzcapp/var/data/uploads:/app/uploads", "DATABASE_URL=file:/appdata/db.sqlite", "SITE_URL=https://{{ .S.AppDomain }}", "/uploads/=http://notebook.com.luck.lazycat.notebook.lzcapp:3000/api/file/", "node /lzcapp/pkg/content/prepare-runtime.mjs"):
         if required not in manifest:
             raise ValueError("Missing persistence, domain or legacy attachment configuration: " + required)
 

@@ -1,6 +1,7 @@
 """Regression checks for version-scoped notes and immutable delivery gates."""
 
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import struct
@@ -45,6 +46,10 @@ class PackageGuardTests(unittest.TestCase):
         (self.root / ".lazycat-action").mkdir()
         self.digest = "sha256:" + "a" * 64
         self.proof = {"source_version": "0.17.1", "application_version": "0.17.1", "digest": self.digest, "baseline_source_version": "0.7.1", "checks": guard.CHECKS}
+        (self.root / 'content').mkdir()
+        content = (ROOT / 'content/prepare-runtime.mjs').read_bytes()
+        (self.root / 'content/prepare-runtime.mjs').write_bytes(content)
+        self.proof['runtime_patch_sha256'] = hashlib.sha256(content).hexdigest()
         self.manifest = (ROOT / "lzc-manifest.yml").read_text() + f"\n    # upstream: docker.io/aidenzou/i-notebook:0.17.1@{self.digest}\n"
         (self.root / "package.yml").write_text("version: 0.17.1\n")
 
@@ -75,6 +80,11 @@ class PackageGuardTests(unittest.TestCase):
         data = (ROOT / "icon.png").read_bytes()
         self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual(struct.unpack(">II", data[16:24]), (512, 512))
+
+    def test_untested_runtime_helper_is_rejected(self):
+        (self.root / 'content/prepare-runtime.mjs').write_text('// changed after testing')
+        with self.assertRaisesRegex(ValueError, 'compatibility helper'):
+            self.check()
 
 
 if __name__ == "__main__":

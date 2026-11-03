@@ -20,6 +20,7 @@ locales:
       从懒猫微服启动应用后即可使用，保留懒猫登录验证。
       笔记数据库和附件持久保存在 /lzcapp/var/data。
       从旧版 0.0.1 升级前，请先备份数据库并导出旧容器的附件，详见适配仓库 README。
+      新版移除了旧任务看板；旧任务会导出到 data/legacy-task-exports，不能直接在新版界面中编辑。
   en-US:
     name: i-notebook
     description: A self-hosted personal knowledge and note-taking application.
@@ -27,6 +28,7 @@ locales:
       Open the application from LazyCat to start using it. LazyCat authentication is retained.
       Notes and attachments are stored persistently in /lzcapp/var/data.
       Before upgrading from 0.0.1, back up the database and export attachments from the old container; see the adapter README.
+      The old task board is removed upstream. Legacy tasks are exported to data/legacy-task-exports and are not editable in the new UI.
 permissions:
   required:
     - net.internet
