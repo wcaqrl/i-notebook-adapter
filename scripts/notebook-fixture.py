@@ -111,7 +111,20 @@ def old_upload(root, base):
         raise ValueError("Old upload API did not persist the attachment")
     state["old_attachment"] = url.removeprefix("/uploads/")
     doc = lexical_document()
-    doc["root"]["children"].append({"type": "image", "version": 1, "src": url, "altText": "升级图片", "width": 1, "height": 1, "maxWidth": 500, "showCaption": False})
+    # Match the real Lexical image serialization: an inline image lives in a
+    # paragraph and always carries its nested caption editor, even if hidden.
+    # Omitting caption.editorState produces an invalid node that the Markdown
+    # exporter silently drops; that would test a malformed fixture, not upgrades.
+    doc["root"]["children"].append({
+        "type": "paragraph", "version": 1, "direction": "ltr", "format": "", "indent": 0,
+        "textFormat": 0, "textStyle": "", "children": [{
+            "type": "image", "version": 1, "src": url, "altText": "升级图片",
+            "width": 1, "height": 1, "maxWidth": 500, "showCaption": False,
+            "caption": {"editorState": {"root": {
+                "type": "root", "version": 1, "direction": None, "format": "", "indent": 0, "children": []
+            }}},
+        }],
+    })
     with sqlite3.connect(root / "data/db.sqlite") as db:
         db.execute('UPDATE "Note" SET content=? WHERE id=?', (json.dumps(doc, ensure_ascii=False), CHILD))
     write_state(root, state)
