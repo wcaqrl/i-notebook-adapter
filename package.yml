@@ -1,0 +1,32 @@
+package: com.luck.lazycat.notebook
+# Existing approved LPK version; its actual upstream software is 0.7.1.
+# Only the executor allocates/commits a new package version after validation.
+version: 0.0.1
+name: i-notebook
+description: 支持自部署的个人知识写作应用，高效组织和管理笔记。
+homepage: https://tangyuanlabs.com/
+author: aidenzou
+min_os_version: 1.5.0
+# Preserve the current listing's desktop launcher scope. This is unrelated
+# to the OCI CPU architecture: the first adapter target remains amd64.
+unsupported_platforms:
+  - android
+  - ios
+locales:
+  zh-CN:
+    name: i-notebook
+    description: 支持自部署的个人知识写作应用，高效组织和管理笔记。
+    usage: |
+      从懒猫微服启动应用后即可使用，保留懒猫登录验证。
+      笔记数据库和附件持久保存在 /lzcapp/var/data。
+      从旧版 0.0.1 升级前，请先备份数据库并导出旧容器的附件，详见适配仓库 README。
+  en-US:
+    name: i-notebook
+    description: A self-hosted personal knowledge and note-taking application.
+    usage: |
+      Open the application from LazyCat to start using it. LazyCat authentication is retained.
+      Notes and attachments are stored persistently in /lzcapp/var/data.
+      Before upgrading from 0.0.1, back up the database and export attachments from the old container; see the adapter README.
+permissions:
+  required:
+    - net.internet

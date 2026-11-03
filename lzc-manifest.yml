@@ -1,0 +1,30 @@
+usage: |
+  从懒猫微服启动应用后即可使用，保留懒猫登录验证。
+  笔记数据库和附件持久保存在 /lzcapp/var/data。
+  从旧版 0.0.1 升级前，请先备份数据库并导出旧容器的附件，详见适配仓库 README。
+application:
+  subdomain: notebook
+  background_task: false
+  multi_instance: false
+  routes:
+    # The approved 0.7.1 runtime stored /uploads/<name> links in note content.
+    # LazyCat strips the route prefix and forwards to the new file API.
+    - /uploads/=http://notebook.com.luck.lazycat.notebook.lzcapp:3000/api/file/
+    - /=http://notebook.com.luck.lazycat.notebook.lzcapp:3000/
+  depends_on:
+    - notebook
+services:
+  notebook:
+    # Approved store baseline. Real builds replace this with the completed
+    # official mirror of the exact digest that passed the upgrade test.
+    image: registry.lazycat.cloud/u91891968/aidenzou/i-notebook:002f6323ee89965e
+    environment:
+      - DATABASE_URL=file:/appdata/db.sqlite
+      - 'SITE_URL=https://{{ .S.AppDomain }}'
+    binds:
+      # Preserve BOTH the historical host directory and database filename.
+      - /lzcapp/var/data:/appdata
+      - /lzcapp/var/data/uploads:/app/uploads
+    # Keep the upstream startup/migration command. It initializes only a
+    # missing database and backs up an existing DB before schema migration.
+    # No shared unlock code/JWT secret and no public_path are introduced.

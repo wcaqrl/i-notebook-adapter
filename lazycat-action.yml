@@ -1,0 +1,52 @@
+version: 2
+project:
+  root: .
+  build_config: lzc-build.yml
+  package_file: package.yml
+  output: dist/com.luck.lazycat.notebook.lpk
+  target_arch: amd64
+source:
+  kind: oci
+  image: docker.io/aidenzou/i-notebook
+  select:
+    strategy: semver-tag
+    channel: stable
+    # Upstream publishes plain x.y.z Docker tags, without a v prefix.
+    # Exclude latest, prereleases and architecture aliases. Compare numeric
+    # SemVer components, then test and deliver the selected platform digest.
+    tag_regex: '^[0-9]+\.[0-9]+\.[0-9]+$'
+changelog:
+  mode: command
+  # The vendor publishes Chinese notes on its own site, not GitHub Releases.
+  # Fail if the exact selected version is absent; never submit the whole page.
+  command: python3 -B scripts/upstream.py changelog
+state:
+  file: .lazycat-action.lock.yml
+update:
+  strategy: publish
+  allow_downgrade: false
+build:
+  run_buildscript: true
+  prepare:
+    mode: command
+    context: scripts
+    command: ./scripts/test-upgrade.sh
+    output_image: '{source_ref}@{source_revision}'
+images:
+  - id: notebook
+    target: service
+    service: notebook
+    source: docker.io/aidenzou/i-notebook
+    delivery:
+      mode: lazycat
+stores:
+  official:
+    enabled: true
+    create_if_missing: false
+    skip_if_version_exists: true
+    continue_if_newer_version: true
+    retry:
+      enabled: true
+      max_attempts: 5
+      initial_delay: 2s
+      max_delay: 30s

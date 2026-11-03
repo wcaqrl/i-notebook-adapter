@@ -1,0 +1,9 @@
+dist/
+.lazycat-action/
+.lazycat-artifact/
+*.lpk
+.env
+.env.*
+__pycache__/
+*.py[cod]
+# Keep the generated .lazycat-action.lock.yml tracked.

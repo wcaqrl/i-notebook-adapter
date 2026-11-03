@@ -1,0 +1,4 @@
+manifest: ./lzc-manifest.yml
+icon: ./icon.png
+pkgout: ./dist
+buildscript: python3 -B scripts/verify-package.py
