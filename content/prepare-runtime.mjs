@@ -17,6 +17,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { pathToFileURL } from 'node:url';
 
 export const MARKER = 'LAZYCAT_LEGACY_FOREIGN_KEY_FIX_V1';
+const BACKUP_MARKER = 'LAZYCAT_MIGRATION_BACKUP_V1';
 const LEGACY_LOOP = `for (const file of pendingLegacyFiles) {
 \t\t\t\tconst sql = await readSql(file.path);
 \t\t\t\tdb.transaction(() => {
@@ -44,6 +45,17 @@ export function patchMigration(source) {
             if (db.prepare("PRAGMA foreign_key_check").all().length) {
                 throw new Error("Legacy migration left invalid foreign keys");
             }`);
+}
+
+export function enableMigrationBackups(source) {
+  if (source.includes(BACKUP_MARKER)) return source;
+  const pattern = /await migrateDatabase\(\{\s*backup: false,/g;
+  if ([...source.matchAll(pattern)].length !== 1) {
+    throw new Error('Unknown upstream migration backup policy; adapter review is required.');
+  }
+  // Upstream implements backup/restore, but its store factory disables it.
+  // Enable it only for real pending migrations; clean restarts create none.
+  return source.replace(pattern, match => match.replace('backup: false', `backup: true /* ${BACKUP_MARKER} */`));
 }
 
 export function archiveLegacyTasks(databaseUrl) {
@@ -81,7 +93,7 @@ export function prepareRuntime(directory = '/app/server/_ssr') {
   if (candidates.length !== 1) throw new Error('Cannot identify exactly one upstream legacy migration module.');
   const path = candidates[0];
   const original = readFileSync(path, 'utf8');
-  const patched = patchMigration(original);
+  const patched = enableMigrationBackups(patchMigration(original));
   if (patched !== original) writeFileSync(path, patched);
   archiveLegacyTasks(process.env.DATABASE_URL);
   console.log('Legacy database compatibility preparation completed.');

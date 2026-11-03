@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
-import { archiveLegacyTasks, patchMigration } from '../content/prepare-runtime.mjs';
+import { archiveLegacyTasks, enableMigrationBackups, patchMigration } from '../content/prepare-runtime.mjs';
 
 const loop = `for (const file of pendingLegacyFiles) {
 \t\t\t\tconst sql = await readSql(file.path);
@@ -50,6 +50,14 @@ test('runtime fix is idempotent and unknown migrators fail closed', () => {
   const patched = patchMigration(loop);
   assert.equal(patchMigration(patched), patched);
   assert.throws(() => patchMigration('unknown migration'), /compatibility review/);
+});
+
+test('upstream backup implementation is enabled without adding restart backups', () => {
+  const source = 'await migrateDatabase({\n\t\tbackup: false,\n databaseUrl: options.databaseUrl });';
+  const patched = enableMigrationBackups(source);
+  assert.match(patched, /backup: true/);
+  assert.equal(enableMigrationBackups(patched), patched);
+  assert.throws(() => enableMigrationBackups('unknown backup policy'), /adapter review/);
 });
 
 test('all legacy task fields survive in a persistent, idempotent archive', () => {
