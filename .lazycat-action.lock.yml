@@ -7,7 +7,7 @@ source:
     tag: 0.17.1
     image: docker.io/aidenzou/i-notebook
 fingerprint: sha256:96221a421574bca31f16ddeff862209b92c53f78ee3852b6979f3684f0c158a4
-status: packaged
+status: submitted
 images:
     - id: notebook
       source_ref: docker.io/aidenzou/i-notebook:0.17.1@sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
@@ -19,3 +19,19 @@ application:
     lpk_sha256: 130ffccf3621bf276b14bf11ecdb6ec430f1d5cd2cc0cfacd59c7efc53dc7a1d
     changelog: "iNotebook 0.17.1\n\n\U0001F389\U0001F389\U0001F389：本次更新围绕版本历史、Mermaid 图表、客户端性能与稳定性等方向进行了增强。\n新特性\n- 完善版本历史：优化快照时间窗口去重，恢复前自动保存未提交内容，并改用原生轻量预览。\n- Mermaid 图表增强：支持与标准 Markdown 双向互转，正文输入```mermaid回车可快捷唤起编辑。\n- 关于页面：版本号后展示 Git Commit ID，便于版本追溯。\n优化\n- 性能与流畅度：\n- 优化桌面端冷启动与首屏加载，调优本地数据读写吞吐。\n- 优化目录树渲染，修改标题与图标支持即时更新。\n- 问题修复：修复跨嵌入块选区坍缩问题，消除活跃度热力图多余滚动条。"
 packaged_at: 2026-11-03T09:49:01.418262245Z
+reviews:
+    - id: 22513
+      source:
+        kind: oci
+        version: 0.17.1
+        ref: docker.io/aidenzou/i-notebook:0.17.1
+        revision: sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
+        tag: 0.17.1
+        image: docker.io/aidenzou/i-notebook
+      fingerprint: sha256:96221a421574bca31f16ddeff862209b92c53f78ee3852b6979f3684f0c158a4
+      application_version: 0.17.1
+      lpk_sha256: 130ffccf3621bf276b14bf11ecdb6ec430f1d5cd2cc0cfacd59c7efc53dc7a1d
+      status: waiting
+      created_at: 2026-11-03T09:49:17.951Z
+      submitted_at: 2026-11-03T09:49:18.074149552Z
+      checked_at: 2026-11-03T09:49:18.074150443Z
