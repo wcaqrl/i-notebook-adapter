@@ -92,3 +92,9 @@ LAZYCAT_SOURCE_VERSION=0.17.1 python3 -B scripts/upstream.py changelog
 容器测试在 GitHub Runner 完成，不访问或安装到开发者的微服生产实例。路由声明依据[懒猫路由文档](https://developer.lazycat.cloud/advanced-route.html)；实际微服安装后的外部路由仍应由使用者验收。
 
 图标直接取自上游 0.17.1 镜像中的 `public/icon-512.png`（512×512 PNG），没有使用占位图。
+
+## 首次验证记录
+
+2026-11-03 已在 GitHub Runner 完成真实 0.7.1 → 0.17.1 升级和全新安装验证，并[真实执行转存、打包和送审](https://github.com/wcaqrl/i-notebook-adapter/actions/runs/41613527136)。首次审核编号 **22513**，提交时状态 `waiting`；状态锁由流程自动提交，后续审核状态以开发者后台和锁文件的最新检查结果为准。
+
+[Release v0.17.1](https://github.com/wcaqrl/i-notebook-adapter/releases/tag/v0.17.1) 提供 `com.luck.lazycat.notebook-v0.17.1.lpk`。包内包含 512×512 图标、迁移兼容脚本和真实官方转存镜像；没有安装到开发者微服生产实例。

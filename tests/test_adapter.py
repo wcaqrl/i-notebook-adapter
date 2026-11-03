@@ -4,6 +4,7 @@ import importlib.util
 import hashlib
 import json
 from pathlib import Path
+import re
 import struct
 import tempfile
 import unittest
@@ -50,7 +51,10 @@ class PackageGuardTests(unittest.TestCase):
         content = (ROOT / 'content/prepare-runtime.mjs').read_bytes()
         (self.root / 'content/prepare-runtime.mjs').write_bytes(content)
         self.proof['runtime_patch_sha256'] = hashlib.sha256(content).hexdigest()
-        self.manifest = (ROOT / "lzc-manifest.yml").read_text() + f"\n    # upstream: docker.io/aidenzou/i-notebook:0.17.1@{self.digest}\n"
+        # Real runs write an upstream pin back to the repository. Replace it
+        # in the isolated fixture so tests remain valid after publication.
+        current = re.sub(r'^\s*# upstream: \S+\s*$', '', (ROOT / 'lzc-manifest.yml').read_text(), flags=re.MULTILINE)
+        self.manifest = current + f"\n    # upstream: docker.io/aidenzou/i-notebook:0.17.1@{self.digest}\n"
         (self.root / "package.yml").write_text("version: 0.17.1\n")
 
     def check(self):
