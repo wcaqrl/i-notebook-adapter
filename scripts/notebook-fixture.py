@@ -107,15 +107,15 @@ def old_upload(root, base):
     state = read_state(root)
     result = upload(base)
     url = result["url"]
-    if not url.startswith("/uploads/") or request(base + url) != PNG:
-        raise ValueError("Old server cannot read its uploaded attachment")
+    if not url.startswith("/uploads/") or (root / "data/uploads" / url.removeprefix("/uploads/")).read_bytes() != PNG:
+        raise ValueError("Old upload API did not persist the attachment")
     state["old_attachment"] = url.removeprefix("/uploads/")
     doc = lexical_document()
     doc["root"]["children"].append({"type": "image", "version": 1, "src": url, "altText": "升级图片", "width": 1, "height": 1, "maxWidth": 500, "showCaption": False})
     with sqlite3.connect(root / "data/db.sqlite") as db:
         db.execute('UPDATE "Note" SET content=? WHERE id=?', (json.dumps(doc, ensure_ascii=False), CHILD))
     write_state(root, state)
-    print("Uploaded and downloaded a real attachment through the old application API.")
+    print("Uploaded a real attachment through the old API and verified its persisted bytes.")
 
 
 def check_database(root, legacy):
@@ -167,7 +167,7 @@ def verify(root, base, legacy):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("init-old", "old-upload", "configure-api", "verify-old", "verify-fresh"))
+    parser.add_argument("operation", choices=("init-old", "old-upload", "old-download", "configure-api", "verify-old", "verify-fresh"))
     parser.add_argument("root", type=Path)
     parser.add_argument("base", nargs="?")
     args = parser.parse_args()
@@ -178,6 +178,10 @@ def main():
             configure_api(args.root, db)
     elif args.operation == "old-upload":
         old_upload(args.root, args.base)
+    elif args.operation == "old-download":
+        state = read_state(args.root)
+        assert request(args.base + "/uploads/" + state["old_attachment"]) == PNG
+        print("Old server downloaded the uploaded attachment after recreation.")
     else:
         verify(args.root, args.base, args.operation == "verify-old")
 

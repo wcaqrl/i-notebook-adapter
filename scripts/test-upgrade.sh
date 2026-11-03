@@ -68,6 +68,11 @@ python3 -B scripts/notebook-fixture.py init-old "$TEST_ROOT/legacy"
 port="$(start_notebook "$OLD_IMAGE" "$TEST_ROOT/legacy" legacy)"
 python3 -B scripts/notebook-fixture.py old-upload "$TEST_ROOT/legacy" "http://127.0.0.1:$port"
 docker stop --time 20 "$CONTAINER" >/dev/null
+# Next.js snapshots public file names at startup: uploaded files become
+# directly routable only after recreation in this historical release.
+port="$(start_notebook "$OLD_IMAGE" "$TEST_ROOT/legacy" legacy)"
+python3 -B scripts/notebook-fixture.py old-download "$TEST_ROOT/legacy" "http://127.0.0.1:$port"
+docker stop --time 20 "$CONTAINER" >/dev/null
 
 echo "Testing 0.7.1 -> $LAZYCAT_SOURCE_VERSION at the exact selected digest"
 port="$(start_notebook "$NEW_IMAGE" "$TEST_ROOT/legacy" current)"
