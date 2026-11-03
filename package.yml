@@ -1,7 +1,7 @@
 package: com.luck.lazycat.notebook
 # Existing approved LPK version; its actual upstream software is 0.7.1.
 # Only the executor allocates/commits a new package version after validation.
-version: 0.0.1
+version: 0.17.1
 name: i-notebook
 description: 支持自部署的个人知识写作应用，高效组织和管理笔记。
 homepage: https://tangyuanlabs.com/

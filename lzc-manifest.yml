@@ -18,7 +18,8 @@ services:
   notebook:
     # Approved store baseline. Real builds replace this with the completed
     # official mirror of the exact digest that passed the upgrade test.
-    image: registry.lazycat.cloud/u91891968/aidenzou/i-notebook:002f6323ee89965e
+    # upstream: docker.io/aidenzou/i-notebook:0.17.1@sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
+    image: registry.lazycat.cloud/peter/aidenzou/i-notebook:fc82cf3ed4d6844f
     environment:
       - DATABASE_URL=file:/appdata/db.sqlite
       - 'SITE_URL=https://{{ .S.AppDomain }}'
