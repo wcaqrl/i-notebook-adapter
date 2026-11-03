@@ -159,7 +159,14 @@ def verify(root, base, legacy):
     if legacy:
         note = api(base, state, "/api/get-page?id=" + CHILD)
         assert note["title"] == TITLE and TEXT in note["content"], "Upgraded application cannot read old notes"
-        assert state["old_attachment"] in note["content"], "Old attachment link lost"
+        # HTML is the rendered image contract; an API Markdown exporter may
+        # omit decorator nodes. Also check the persisted JSON independently.
+        rendered = api(base, state, "/api/get-page?id=" + CHILD + "&format=html")
+        if state["old_attachment"] not in rendered["content"] or "<img" not in rendered["content"]:
+            with sqlite3.connect(root / "data/db.sqlite") as db:
+                stored = db.execute('SELECT content FROM Note WHERE id=?', (CHILD,)).fetchone()[0]
+            raise ValueError("Old image rendering failed; stored attachment=" + str(state["old_attachment"] in stored)
+                             + "; Markdown=" + repr(note["content"][:1200]) + "; HTML=" + repr(rendered["content"][:1600]))
         # /uploads/<key> is forwarded here by the LazyCat manifest compatibility route.
         assert request(base + "/api/file/" + state["old_attachment"]) == PNG
     if "new_note" not in state:
