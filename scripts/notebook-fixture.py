@@ -137,7 +137,8 @@ def check_database(root, legacy):
         assert not db.execute("PRAGMA foreign_key_check").fetchall(), "Broken relationships"
         if legacy:
             title, content, parent, sort_order, star = db.execute('SELECT title,content,pId,sortOrder,starAt FROM Note WHERE id=?', (CHILD,)).fetchone()
-            assert title == TITLE and parent == PARENT and sort_order == 7 and star, "Lost note metadata"
+            expected_sort = read_state(root).get("child_sort_order", 7)
+            assert title == TITLE and parent == PARENT and sort_order == expected_sort and star, f"Lost note metadata: {(title, parent, sort_order, star)!r}"
             assert TEXT in content and read_state(root)["old_attachment"] in content, "Lost note content"
             assert db.execute('SELECT noteTitle FROM NoteHistory WHERE id=?', ("lzchistory01",)).fetchone() == (TITLE,), "Lost history"
         assert db.execute('SELECT value FROM Config WHERE key="openApiEnabled"').fetchone() == ("true",)
@@ -147,6 +148,10 @@ def check_database(root, legacy):
 
 def verify(root, base, legacy):
     state = read_state(root)
+    # Assert the exact original sort order before API writes can legitimately
+    # insert siblings and reorder the directory. Recreation then checks the
+    # resulting application-managed position instead of assuming it stays 7.
+    check_database(root, legacy)
     page = request(base + "/start").decode()
     assert "<html" in page.lower(), "Missing application UI"
     # Real API authentication, including rejection of anonymous access.
@@ -175,6 +180,9 @@ def verify(root, base, legacy):
             payload["pId"] = PARENT
         created = api(base, state, "/api/create-page", payload)
         state["new_note"] = created["id"]
+        if legacy:
+            with sqlite3.connect(root / "data/db.sqlite") as db:
+                state["child_sort_order"] = db.execute('SELECT sortOrder FROM Note WHERE id=?', (CHILD,)).fetchone()[0]
         attachment = upload(base)
         state["new_attachment"] = attachment["filename"]
         write_state(root, state)
