@@ -7,7 +7,7 @@ source:
     tag: 0.18.0
     image: docker.io/aidenzou/i-notebook
 fingerprint: sha256:792649bf35fb23cf5cd2dc64f02b6f0a50076c97d7ac04ac186731ce7dc17f1b
-status: packaged
+status: submitted
 images:
     - id: notebook
       source_ref: docker.io/aidenzou/i-notebook:0.18.0@sha256:d160c721ce0015412bdd4671c885af59036ad4b55a679a979a0e29cb76217cf4
@@ -35,3 +35,18 @@ reviews:
       created_at: 2026-11-03T09:49:17.951Z
       submitted_at: 2026-11-03T09:49:18.074149552Z
       checked_at: 2026-11-04T13:04:51.026026016Z
+    - id: 22850
+      source:
+        kind: oci
+        version: 0.18.0
+        ref: docker.io/aidenzou/i-notebook:0.18.0
+        revision: sha256:d160c721ce0015412bdd4671c885af59036ad4b55a679a979a0e29cb76217cf4
+        tag: 0.18.0
+        image: docker.io/aidenzou/i-notebook
+      fingerprint: sha256:792649bf35fb23cf5cd2dc64f02b6f0a50076c97d7ac04ac186731ce7dc17f1b
+      application_version: 0.18.0
+      lpk_sha256: 4e63945799d7ad44d5f66093b9a4721bd712e8288506b050f94df2c1957a7e3c
+      status: waiting
+      created_at: 2026-11-09T14:09:42.868Z
+      submitted_at: 2026-11-09T14:09:43.018880473Z
+      checked_at: 2026-11-09T14:09:43.018881085Z
