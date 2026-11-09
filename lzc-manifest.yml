@@ -18,8 +18,8 @@ services:
   notebook:
     # Approved store baseline. Real builds replace this with the completed
     # official mirror of the exact digest that passed the upgrade test.
-    # upstream: docker.io/aidenzou/i-notebook:0.17.1@sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
-    image: registry.lazycat.cloud/peter/aidenzou/i-notebook:fc82cf3ed4d6844f
+    # upstream: docker.io/aidenzou/i-notebook:0.18.0@sha256:d160c721ce0015412bdd4671c885af59036ad4b55a679a979a0e29cb76217cf4
+    image: registry.lazycat.cloud/peter/aidenzou/i-notebook:d2f252a9650108cd
     environment:
       - DATABASE_URL=file:/appdata/db.sqlite
       - 'SITE_URL=https://{{ .S.AppDomain }}'

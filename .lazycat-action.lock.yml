@@ -1,24 +1,24 @@
 version: 2
 source:
     kind: oci
-    version: 0.17.1
-    ref: docker.io/aidenzou/i-notebook:0.17.1
-    revision: sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
-    tag: 0.17.1
+    version: 0.18.0
+    ref: docker.io/aidenzou/i-notebook:0.18.0
+    revision: sha256:d160c721ce0015412bdd4671c885af59036ad4b55a679a979a0e29cb76217cf4
+    tag: 0.18.0
     image: docker.io/aidenzou/i-notebook
-fingerprint: sha256:96221a421574bca31f16ddeff862209b92c53f78ee3852b6979f3684f0c158a4
-status: submitted
+fingerprint: sha256:792649bf35fb23cf5cd2dc64f02b6f0a50076c97d7ac04ac186731ce7dc17f1b
+status: packaged
 images:
     - id: notebook
-      source_ref: docker.io/aidenzou/i-notebook:0.17.1@sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
-      source_digest: sha256:4652027c62343d6203163f5018a7eb623ccd9f925719be3a9aa4065da77f6b4b
-      runtime_ref: registry.lazycat.cloud/peter/aidenzou/i-notebook:fc82cf3ed4d6844f
+      source_ref: docker.io/aidenzou/i-notebook:0.18.0@sha256:d160c721ce0015412bdd4671c885af59036ad4b55a679a979a0e29cb76217cf4
+      source_digest: sha256:d160c721ce0015412bdd4671c885af59036ad4b55a679a979a0e29cb76217cf4
+      runtime_ref: registry.lazycat.cloud/peter/aidenzou/i-notebook:d2f252a9650108cd
 application:
     package: com.luck.lazycat.notebook
-    version: 0.17.1
-    lpk_sha256: 130ffccf3621bf276b14bf11ecdb6ec430f1d5cd2cc0cfacd59c7efc53dc7a1d
-    changelog: "iNotebook 0.17.1\n\n\U0001F389\U0001F389\U0001F389：本次更新围绕版本历史、Mermaid 图表、客户端性能与稳定性等方向进行了增强。\n新特性\n- 完善版本历史：优化快照时间窗口去重，恢复前自动保存未提交内容，并改用原生轻量预览。\n- Mermaid 图表增强：支持与标准 Markdown 双向互转，正文输入```mermaid回车可快捷唤起编辑。\n- 关于页面：版本号后展示 Git Commit ID，便于版本追溯。\n优化\n- 性能与流畅度：\n- 优化桌面端冷启动与首屏加载，调优本地数据读写吞吐。\n- 优化目录树渲染，修改标题与图标支持即时更新。\n- 问题修复：修复跨嵌入块选区坍缩问题，消除活跃度热力图多余滚动条。"
-packaged_at: 2026-11-03T09:49:01.418262245Z
+    version: 0.18.0
+    lpk_sha256: 4e63945799d7ad44d5f66093b9a4721bd712e8288506b050f94df2c1957a7e3c
+    changelog: "iNotebook 0.18.0\n\n\U0001F389\U0001F389\U0001F389：本次更新带来了全新的 全景关系图谱、轻量级图表引擎、双向链接深度优化 与 更稳固的安全隐私防护。\n新特性\n- 全新全景关系图谱：支持径向布局、独立控制抽屉与右侧笔记实时预览，全局知识网络一目了然\n- 关系图谱秒开体验：配合预加载与雷达骨架屏技术，大型图谱瞬间呈现，告别白屏等待\n- 局域网私有化开箱即用：网络环境自适应优化，家庭 NAS 与局域网私有部署免配置顺畅运行\n- 账户安全与隐私全面加固：密码修改后历史登录即时失效，公开分享内容严格脱敏，守护数据隐私\n- 【编辑器】新增智能空行提示，圆点清晰指示输入位置，并在光标聚焦时自动隐去\n优化\n- 【图表】Mermaid 图表引擎全面轻量化，渲染更迅速，且无感跟随深浅主题平滑切换\n- 【双链】双向链接检索与加载速度提升数倍，并支持键盘无障碍快捷浏览\n- 【链接识别】优化未链接提及识别，智能排除网址内的关键词误匹配，保护链接完整\n- 【导出】增强右键“复制为 Markdown”，复杂图文、卡片与图表内容无损完整导出\n- 【排版】规范编辑器内边距，文本与文档标题、图标严格对齐，视觉更舒适\n- 【集合】整合集合管理入口，优化表格工具栏交互并修复偶发报错\n- 更小的运行体积与更强韧流畅的系统性能"
+packaged_at: 2026-11-09T14:09:22.727406621Z
 reviews:
     - id: 22513
       source:
