@@ -95,5 +95,4 @@ jobs:
       runner: ubuntu-24.04
       dry-run: ${{ github.event_name == 'push' || (github.event_name == 'schedule' && vars.LAZYCAT_AUTO_PUBLISH != 'true') || (github.event_name == 'workflow_dispatch' && inputs.dry-run) }}
       retry-rejected: ${{ github.event_name == 'workflow_dispatch' && inputs.retry-rejected || false }}
-    secrets:
-      LZC_API_TOKEN: ${{ secrets.LZC_API_TOKEN }}
+    secrets: inherit
