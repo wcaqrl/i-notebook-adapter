@@ -1,6 +1,6 @@
 # i-notebook 懒猫应用自动更新适配器
 
-为现有应用 **`com.luck.lazycat.notebook`** 提供更新，保留原包名、`notebook` 服务、应用子域名和数据库文件。上游项目保持独立；本仓库复用 [`lazycat-action@v1`](https://github.com/wcaqrl/lazycat-action)。
+为现有应用 **`com.luck.lazycat.notebook`** 提供更新，保留原包名、`notebook` 服务、应用子域名和数据库文件。上游项目保持独立；本仓库复用 [`lazycat-action@v1`](https://github.com/lazycat-adapter/lazycat-action)。
 
 ## 版本来源与发布过程
 
@@ -23,7 +23,7 @@ Release 失败不阻塞送审；不上传 `.sha256` 附件。GitHub 自动显示
 
 ## Actions 配置与操作
 
-1. Settings → Secrets and variables → Actions → **Secrets**：设置 `LZC_API_TOKEN`，PAT 所属开发者需有此应用的所有者或协作者权限。无需 Docker 登录、GitHub 上游 Token 或 SSH Key。
+1. 在 `lazycat-adapter` 组织的 Actions secrets 中授权本仓库使用 `LZC_API_TOKEN`，PAT 所属开发者需有此应用的所有者或协作者权限。无需 Docker 登录、GitHub 上游 Token 或 SSH Key。
 2. 工作流为 **Update i-notebook for LazyCat**。每次适配代码 push 会先在 GitHub Runner 做真实容器测试，再只读检查版本，不送审。
 3. Actions → Run workflow：默认勾选 `dry-run`，只检查版本和日志；取消勾选后验证权限、运行升级测试、转存、打包并送审。
 4. 每天北京时间 **13:23** 定时触发，GitHub 调度可能延迟。设置 Actions **Variables** 的 `LAZYCAT_AUTO_PUBLISH=true` 才会自动真实发布；未设置时定时仅检查。
